@@ -1,7 +1,5 @@
 require 'down'
 
-require 'byebug'
-
 module EVEKillReport
   class StaticData
     MAP_URL = 'https://www.fuzzwork.co.uk/dump/latest/mapDenormalize.csv'
