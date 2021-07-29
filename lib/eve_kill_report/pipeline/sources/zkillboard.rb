@@ -1,6 +1,7 @@
 require 'httpx/adapters/faraday'
 require 'faraday-http-cache'
 require 'json'
+require 'retriable'
 
 module EVEKillReport
   class Pipeline
@@ -38,24 +39,26 @@ module EVEKillReport
               progress.start
             end
 
-            alliance_killmails = []
-            page_count = 1
-            loop do
-              url = "https://zkillboard.com/api/allianceID/#{alliance_id}/losses/#{date_path}/page/#{page_count}/"
-              response = zkillboard.get(url)
-              data = JSON.parse(response.body)
+            Retriable.retriable on: [JSON::ParserError], tries: 10 do
+              alliance_killmails = []
+              page_count = 1
+              loop do
+                url = "https://zkillboard.com/api/allianceID/#{alliance_id}/losses/#{date_path}/page/#{page_count}/"
+                response = zkillboard.get(url)
+                data = JSON.parse(response.body)
 
-              logger.debug("Got #{data.count} killmail(s) from #{url}")
+                logger.debug("Got #{data.count} killmail(s) from #{url}")
 
-              break if data.empty?
+                break if data.empty?
 
-              alliance_killmails.push(*data)
-              page_count += 1
-              sleep(10)
+                alliance_killmails.push(*data)
+                page_count += 1
+                sleep(15)
+              end
+
+              all_killmails.push(*alliance_killmails)
+              logger.debug("Got #{alliance_killmails.count} total killmail(s) for alliance #{alliance_id}")
             end
-
-            all_killmails.push(*alliance_killmails)
-            logger.debug("Got #{alliance_killmails.count} total killmail(s) for alliance #{alliance_id}")
 
             progress.finish if options['progress']
           end
