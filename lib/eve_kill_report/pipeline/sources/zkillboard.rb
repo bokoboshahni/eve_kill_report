@@ -1,4 +1,5 @@
-require 'httpx'
+require 'httpx/adapters/faraday'
+require 'faraday-http-cache'
 require 'json'
 
 module EVEKillReport
@@ -71,7 +72,11 @@ module EVEKillReport
         end
 
         def zkillboard
-          @zkillboard ||= HTTPX.plugin(:retries).max_retries(10).with_headers('User-Agent' => user_agent)
+          @zkillboard ||= Faraday.new(headers: { 'User-Agent' => user_agent }) do |config|
+            config.use :http_cache, store: EVEKillReport.cache, logger: logger
+            config.request :retry, max: 10
+            config.adapter :httpx
+          end
         end
       end
     end

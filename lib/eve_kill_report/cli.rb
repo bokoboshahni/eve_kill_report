@@ -3,9 +3,11 @@ require 'json'
 require 'thor'
 require 'tty-logger'
 
+require_relative '../eve_kill_report'
 require_relative './esi_helper'
 require_relative './pipeline'
 require_relative './static_data'
+
 module EVEKillReport
   class CLI < Thor
     include ESIHelper
@@ -44,7 +46,7 @@ module EVEKillReport
         opts[:alliance].each do |alliance_name|
           Retriable.retriable on: [JSON::ParserError] do
             logger.debug("Searching for alliance: #{alliance_name}")
-            response = esi.get("https://esi.evetech.net/latest/search", params: { 'categories' => 'alliance', 'search' => alliance_name, 'strict' => true })
+            response = esi.get("https://esi.evetech.net/latest/search", { 'categories' => 'alliance', 'search' => alliance_name, 'strict' => true })
             result = JSON.parse(response.body)
 
             if result.empty?

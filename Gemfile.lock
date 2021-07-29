@@ -8,6 +8,9 @@ PATH
       concurrent-ruby-edge
       concurrent-ruby-ext
       down
+      faraday
+      faraday-http-cache
+      faraday_middleware
       google-apis-drive_v3
       google-apis-sheets_v4
       httpx
@@ -62,10 +65,14 @@ GEM
     faraday-em_http (1.0.0)
     faraday-em_synchrony (1.0.0)
     faraday-excon (1.1.0)
+    faraday-http-cache (2.2.0)
+      faraday (>= 0.8)
     faraday-httpclient (1.0.1)
     faraday-net_http (1.0.1)
     faraday-net_http_persistent (1.2.0)
     faraday-patron (1.0.0)
+    faraday_middleware (1.0.0)
+      faraday (~> 1.0)
     google-apis-core (0.4.1)
       addressable (~> 2.5, >= 2.5.1)
       googleauth (>= 0.16.2, < 2.a)

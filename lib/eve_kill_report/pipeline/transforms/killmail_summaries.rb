@@ -13,7 +13,7 @@ module EVEKillReport
           killmail_hash = killmail['zkb']['hash']
 
           if killmail['killmail_time'].nil?
-            logger.warning("Killmail #{killmail_id}/#{killmail_hash} has no date")
+            logger.warn("Killmail #{killmail_id}/#{killmail_hash} has no date")
             killmail_date = ''
           else
             killmail_date = DateTime.parse(killmail['killmail_time']).to_date
