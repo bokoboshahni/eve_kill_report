@@ -1,0 +1,5 @@
+#!/usr/bin/env ruby
+
+require "eve_kill_report/cli"
+
+EVEKillReport::CLI.start
