@@ -11,10 +11,18 @@ module EVEKillReport
         def process(killmail)
           killmail_id = killmail['killmail_id']
           killmail_hash = killmail['zkb']['hash']
+
+          if killmail['killmail_time'].nil?
+            logger.warning("Killmail #{killmail_id}/#{killmail_hash} has no date")
+            killmail_date = ''
+          else
+            killmail_date = DateTime.parse(killmail['killmail_time']).to_date
+          end
+
           killmail.replace(
             id: killmail_id,
             hash: killmail_hash,
-            date: DateTime.parse(killmail['killmail_time']).to_date,
+            date: killmail_date,
             ship: killmail['ship'][:typename],
             alliance: killmail['alliance']['name'],
             corporation: killmail['corporation']['name'],
