@@ -50,7 +50,7 @@ module EVEKillReport
 
               alliance_killmails.push(*data)
               page_count += 1
-              sleep(5)
+              sleep(10)
             end
 
             all_killmails.push(*alliance_killmails)
