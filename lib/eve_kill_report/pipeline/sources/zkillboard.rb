@@ -39,13 +39,13 @@ module EVEKillReport
               progress.start
             end
 
-            Retriable.retriable on: [JSON::ParserError], tries: 10 do
+            Retriable.retriable on: [Oj::ParseError], tries: 10 do
               alliance_killmails = []
               page_count = 1
               loop do
                 url = "https://zkillboard.com/api/allianceID/#{alliance_id}/losses/#{date_path}/page/#{page_count}/"
                 response = zkillboard.get(url)
-                data = JSON.parse(response.body)
+                data = Oj.load(response.body)
 
                 logger.debug("Got #{data.count} killmail(s) from #{url}")
 
@@ -57,13 +57,13 @@ module EVEKillReport
               end
 
               all_killmails.push(*alliance_killmails)
-              logger.debug("Got #{alliance_killmails.count} total killmail(s) for alliance #{alliance_id}")
+              logger.info("Indexed #{alliance_killmails.count} total killmail(s) for alliance #{alliance_id}")
             end
 
             progress.finish if options['progress']
           end
 
-          logger.debug("Got #{@killmails.count} total killmail(s) from zKillboard")
+          logger.debug("Indexed #{@killmails.count} total killmail(s) from zKillboard")
         end
 
         def date_path
@@ -76,7 +76,7 @@ module EVEKillReport
 
         def zkillboard
           @zkillboard ||= Faraday.new(headers: { 'User-Agent' => user_agent }) do |config|
-            config.use :http_cache, store: EVEKillReport.cache, logger: logger
+            config.use(:http_cache, store: EVEKillReport.cache, logger: logger) if options['cache']
             config.request :retry, max: 10
             config.adapter :httpx
           end

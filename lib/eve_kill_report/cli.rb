@@ -1,5 +1,5 @@
 require 'active_support/core_ext/integer/time'
-require 'json'
+require 'oj'
 require 'thor'
 require 'tty-logger'
 
@@ -18,15 +18,18 @@ module EVEKillReport
     desc 'victims [OPTIONS]', 'Generate a victim report'
     method_option :alliance, type: :string, repeatable: true
     method_option :alliance_ids, type: :array
+    method_option :cache, type: :boolean, default: false
     method_option :days, type: :numeric
     method_option :format, type: :string, repeatable: true
     method_option :output, type: :string, repeatable: true
     method_option :month, type: :numeric
     method_option :progress, type: :boolean
+    method_option :redis_url, type: :string
     method_option :region, type: :string, repeatable: true
     method_option :user_agent, type: :string
     method_option :year, type: :numeric
     method_option :yesterday, type: :boolean
+    method_option :date, type: :string
     def victims
       @user_agent = options[:user_agent]
 
@@ -44,10 +47,10 @@ module EVEKillReport
       if opts[:alliance]
         opts[:alliance_ids] ||= []
         opts[:alliance].each do |alliance_name|
-          Retriable.retriable on: [JSON::ParserError] do
+          Retriable.retriable on: [Oj::ParseError] do
             logger.debug("Searching for alliance: #{alliance_name}")
             response = esi.get("https://esi.evetech.net/latest/search", { 'categories' => 'alliance', 'search' => alliance_name, 'strict' => true })
-            result = JSON.parse(response.body)
+            result = Oj.load(response.body)
 
             if result.empty?
               logger.error "Alliance not found: #{alliance_name}"

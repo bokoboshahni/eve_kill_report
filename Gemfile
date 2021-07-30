@@ -7,6 +7,7 @@ gemspec
 
 gem 'byebug'
 gem 'dotenv'
+gem 'oj'
 gem 'pry'
 gem "rake", "~> 13.0"
 gem "rspec", "~> 3.0"

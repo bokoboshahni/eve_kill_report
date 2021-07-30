@@ -1,6 +1,5 @@
 require 'httpx/adapters/faraday'
 require 'faraday-http-cache'
-require 'json'
 
 module EVEKillReport
   module ESIHelper
@@ -8,7 +7,7 @@ module EVEKillReport
 
     def esi
       @esi ||= Faraday.new(headers: { 'User-Agent' => user_agent }) do |config|
-        config.use :http_cache, store: EVEKillReport.cache, logger: logger
+        config.use(:http_cache, store: EVEKillReport.cache, logger: logger) if options['cache']
         config.request :retry, max: 10
         config.adapter :httpx
       end

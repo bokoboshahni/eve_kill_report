@@ -6,10 +6,10 @@ require 'tty-progressbar'
 require_relative './pipeline/sources/zkillboard'
 require_relative './pipeline/transforms/esi_killmails'
 require_relative './pipeline/transforms/killmail_alliances'
+require_relative './pipeline/transforms/killmail_attackers'
 require_relative './pipeline/transforms/killmail_corporations'
 require_relative './pipeline/transforms/killmail_locations'
 require_relative './pipeline/transforms/killmail_types'
-require_relative './pipeline/transforms/killmail_summaries'
 require_relative './pipeline/destinations/comma_separated'
 require_relative './pipeline/destinations/excel'
 require_relative './pipeline/destinations/google_sheets'
@@ -36,7 +36,7 @@ module EVEKillReport
 
     attr_reader :destinations, :killmails, :logger, :options, :static_data, :transforms, :max_threads
 
-    DEFAULT_MAX_THREADS = Etc.nprocessors * 2
+    DEFAULT_MAX_THREADS = Etc.nprocessors
 
     DEFAULT_TRANSFORMS = [
       EVEKillReport::Pipeline::Transforms::ESIKillmails,
@@ -44,7 +44,7 @@ module EVEKillReport
       EVEKillReport::Pipeline::Transforms::KillmailAlliances,
       EVEKillReport::Pipeline::Transforms::KillmailCorporations,
       EVEKillReport::Pipeline::Transforms::KillmailTypes,
-      EVEKillReport::Pipeline::Transforms::KillmailSummaries
+      EVEKillReport::Pipeline::Transforms::KillmailAttackers
     ]
 
     def extract

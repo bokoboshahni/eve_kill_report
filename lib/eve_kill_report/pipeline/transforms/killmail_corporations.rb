@@ -1,4 +1,5 @@
 require 'active_support/core_ext/class/attribute'
+require 'oj'
 require 'retriable'
 
 require 'eve_kill_report/esi_helper'
@@ -12,10 +13,11 @@ module EVEKillReport
         def initialize(options = {})
           @user_agent = options[:user_agent]
           @logger = options[:logger]
+          @options = options
         end
 
         def process(killmail)
-          Retriable.retriable on: [JSON::ParserError] do
+          Retriable.retriable on: [Oj::ParseError] do
             begin
               corporation_id = killmail['victim']['corporation_id']
               if corporations.key?(corporation_id)
@@ -24,12 +26,12 @@ module EVEKillReport
                 url = "https://esi.evetech.net/latest/corporations/#{corporation_id}/"
                 logger.debug("Fetching corporation from ESI: #{url}")
                 response = esi.get(url)
-                corporation = JSON.parse(response.body)
+                corporation = Oj.load(response.body)
                 corporations[corporation_id] = corporation
                 killmail.merge!('corporation' => corporation)
               end
             rescue NoMethodError
-              logger.error("Unknown corporation for killmail #{killmail['killmail_id']}")
+              logger.error("Unknown corporation for killmail #{killmail['killmail_id']}. Check #{url}")
               killmail.merge!('corporation' => 'Unknown')
             end
           end
@@ -37,7 +39,7 @@ module EVEKillReport
 
         private
 
-        attr_reader :user_agent, :logger
+        attr_reader :user_agent, :logger, :options
 
         class_attribute :corporations, instance_reader: true
         self.corporations = {}
