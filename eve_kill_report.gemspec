@@ -39,6 +39,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'hiredis'
   spec.add_dependency 'httpx'
   spec.add_dependency 'kiba'
+  spec.add_dependency 'oj'
   spec.add_dependency 'redis'
   spec.add_dependency 'retriable'
   spec.add_dependency 'thor'

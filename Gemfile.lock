@@ -16,6 +16,7 @@ PATH
       hiredis
       httpx
       kiba
+      oj
       redis
       retriable
       thor
